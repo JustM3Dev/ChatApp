@@ -1,0 +1,74 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  opacity: 1;
+}
+
+.chat {
+  margin-left: .5%;
+  margin-right: .5%;
+  margin-top: .5%;
+  border-radius: 5px;
+  border: 20%;
+  color: #fff;
+  max-height: calc(100vh - 127px);
+  overflow: auto;
+  background-color: #343a40;
+}
+
+.outgoing,
+.ingoing {
+  width: 80%;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 2px 0px 5px 5px;
+  -webkit-box-shadow: 3px 3px 5px #252525;
+          box-shadow: 3px 3px 5px #252525;
+}
+
+.outgoing {
+  float: left;
+  background: #048f04;
+}
+
+.ingoing {
+  float: right;
+  background: #0084ff;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+}
+
+.blur {
+  -webkit-filter: blur(1px);
+          filter: blur(1px);
+  -webkit-transition: blur() 100ms;
+  transition: blur() 100ms;
+}
+
+.timestamp {
+  text-align: right;
+  color: #fff;
+  opacity: 0.2;
+}
+
+.blue-text h2 {
+  color: #1d92ff;
+}
+
+.blue-text p {
+  font-size: 20px;
+}
+/*# sourceMappingURL=main.css.map */

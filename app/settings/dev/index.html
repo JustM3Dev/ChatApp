@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev mode</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 5px 5px 5px 5px;
+        }
+
+        .console {
+            background: #000;
+            color: #fff;
+            font-family: 'JetBrains Mono',
+                monospace;
+            width: calc(100vw - 15px);
+            min-width: calc(100vw - 15px);
+            max-width: calc(100vw - 15px);
+            height: 400px;
+            min-height: 400px;
+            max-height: 600px
+        }
+    </style>
+
+    Add new entry:
+    <p>
+        Name:
+        <input type="text" id="name">
+        Value:
+        <input type="text" id="val">
+        <button onclick="add()">Add localStorage entry</button>
+    </p>
+    <br>
+    Remove entry:
+    <p>
+        Name:
+        <input type="text" id="rmName">
+        <button onclick="remove()">Remove localStorage item</button>
+    </p>
+    <br>
+    Print entry:
+    <p>
+        Name:
+        <input type="text" id="pName">
+        <button onclick="print()">Print</button>
+        <button onclick="printAll()">Print all</button>
+        <button onclick="clearConsole()">Clear output</button>
+        <input type="checkbox" id="autoScroll" checked>Autoscroll</input>
+    <p>
+        Output:
+        <br>
+        <textarea type="textarea" id="console" class="console" disabled></textarea>
+    </p>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        var temp;
+        $(document).ready(() => {
+            temp = 0;
+            termOut('The log will appear here.', true)
+        });
+
+        $(":button").click(function (e) {
+            if (temp <= 0) {
+                termOut('', true)
+                eval(e.currentTarget.attributes.onclick.value);
+                temp++;
+            }
+        });
+
+        function add() {
+            var name = $('#name').val();
+            var val = $('#val').val();
+            localStorage.setItem(name, val);
+
+            termOut(`Successfully added entry ${name} with value ${val}.`);
+        }
+
+        function remove() {
+            var name = $('#rmName').val();
+            localStorage.removeItem(name);
+            termOut(`Successfully deleted entry ${name}.`);
+        }
+
+        function print() {
+            var name = $('#pName').val();
+            var out = localStorage.getItem(name);
+            var terminal = $('#console');
+            if (out == null) out = 'Entry not found.';
+            termOut(out);
+        }
+
+        function printAll() {
+            var out = allStorage();
+            var terminal = $('#console');
+            termOut(out);
+        }
+
+        function clearConsole() {
+            var terminal = $('#console');
+            termOut('', true);
+        }
+
+        // Helpers
+        function termOut(message, override = false) {
+            var autoScroll = $('#autoScroll').is(':checked');
+            var terminal = $('#console');
+
+            if (autoScroll) {
+                //terminal.scrollTop(terminal.prop('scrollHeight') - terminal.height());
+                terminal.animate({
+                    scrollTop: terminal[0].scrollHeight - terminal.height()
+                }, 200);
+            }
+
+            var out;
+            if (terminal.val() == '') out = `${terminal.val()}`;
+            else out = `${terminal.val()}\n`;
+
+            if (override) terminal.val(message);
+            else terminal.val(`${out}${message}`);
+        }
+
+
+        function allStorage() {
+            var values = {},
+                keys = Object.keys(localStorage),
+                i = keys.length;
+
+            while (i--) {
+                values[keys[i]] = localStorage.getItem(keys[i]);
+            }
+
+            return JSON.stringify(values, null, 4);
+        }
+    </script>
+</body>
+
+</html>

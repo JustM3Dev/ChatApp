@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+</head>
+
+<body class="bg-dark text-white text-center m-5" style="font-family: 'Jetbrains Mono', monospace;">
+    <h1 id="symbol"></h1>
+    <br>
+    <h2 id="code"></h2>
+    <h5 id="message"></h5>
+    <noscript>
+        <h1>:/</h1>
+        <br>
+        <h2>JavaScript is disabled</h2>
+        <h5>Please enable JavaScript for this web-page. If you are concerned about your privacy, then please click <a
+                href="/about/privacy/">here</a><br> and make yourself familiar with our privacy policy. Without it this
+            web-app wont work.</h5>
+    </noscript>
+    <br>
+    <button class="btn btn-outline-secondary" onclick="window.history.back()">Go back</button>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(() => {
+            let urlParams = [getParameterByName('code'), getParameterByName('message'), getParameterByName(
+                'happy')];
+            if (urlParams[0] != null) $('#code').text(urlParams[0]);
+            if (urlParams[1] != null) $('#message').text(urlParams[1]);
+            if (urlParams[2] != null) $('#symbol').text(':)');
+            else $('#symbol').text(':/');
+        });
+
+
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+    </script>
+</body>
+
+</html>

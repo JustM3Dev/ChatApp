@@ -1,0 +1,20 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "config.js": "^0.1.0",
+    "mysql": "^2.18.1",
+    "sequelize": "^6.5.0",
+    "socket.io": "^3.0.4",
+    "sqlite3": "^5.0.0",
+    "ws": "^7.4.1"
+  }
+}

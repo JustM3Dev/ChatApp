@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Login - chatapp</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--Imports-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link rel="stylesheet" href="/main.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="mt-3">Login</h2>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted mb-2">
+                    Enter your name. (This will be visible for other people in this network)
+                </h6>
+                <p class="card-text">
+                    <input class="form-control" type="text" placeholder="Display name" id="name">
+                    <button class="btn btn-outline-success w-100 mt-3" onclick="validate()">Continue</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast align-items-center text-white bg-primary border-0 position-absolute top-0 end-0 mt-2 me-2">
+        <div class="d-flex">
+            <div class="toast-body">
+                Loading...
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- JS Imports -->
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
+    <script>
+        const socket = io.connect('ws://192.168.4.48:8080', {
+            'connect timeout': 5000
+        });
+
+        function validate() {
+            var name = $("#name").val();
+            if (name.length <= 9) {
+                if (name.length >= 3) {
+                    registerUser(name);
+                } else {
+                    $(".toast-body").html('The name has to be 3 characters or longer. (max. 9)');
+                    $(".toast").toast('show');
+                }
+            } else {
+                $(".toast-body").html('The name has to be 9 characters or shorter.');
+                $(".toast").toast('show');
+            }
+        }
+
+        function registerUser(name) {
+            id = localStorage.getItem('uuid');
+            if (id == null) {
+                id = genID();
+                localStorage.setItem('uuid', id);
+            }
+
+            socket.emit('registerUser', {
+                displayName: name,
+                uuid: id
+            });
+
+            socket.on('registeredUser', (data) => {
+                if (data.uuid == id) {
+                    localStorage.setItem("displayName", name);
+                    window.location.href = "/";
+                }
+            });
+        }
+
+        function genID() {
+            return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())) * 2;
+        }
+    </script>
+</body>
+
+</html>

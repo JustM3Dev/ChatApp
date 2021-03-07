@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Chat-app</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+</head>
+
+<body class="bg-dark text-white m-3" onload="document.body.style.opacity='1'">
+    <button class="btn btn-outline-danger w-100" onclick="modalAction('clearChat')">Clear chat history</button>
+    <button class="btn btn-outline-primary w-100 mt-3" id="togglePicker">Customize colors</button>
+
+    <div class="d-flex mt-3 mb-3">
+        <div id="ingoingPicker"></div>
+        <div id="outgoingPicker" class="ms-3"></div>
+    </div>
+
+    <div class="textColor">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="ingoingText" id="ingoingBlack">
+            <label class="form-check-label" for="ingoingBlack">
+                Black
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="ingoingText" id="ingoingWhite" checked>
+            <label class="form-check-label" for="ingoingWhite">
+                White
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="outgoingText" id="outgoingBlack">
+            <label class="form-check-label" for="outgoingBlack">
+                Black
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="outgoingText" id="outgoingWhite" checked>
+            <label class="form-check-label" for="outgoingWhite">
+                White
+            </label>
+        </div>
+    </div>
+
+    <div class="toast align-items-center text-white bg-primary border-0 position-absolute top-0 end-0 mt-2 me-2">
+        <div class="d-flex">
+            <div class="toast-body">
+                Loading...
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script>
+        var ingoingPicker = new iro.ColorPicker("#ingoingPicker", {
+            color: JSON.parse(localStorage.getItem('style')).ingoing.background,
+            width: 280,
+            borderWidth: 2,
+            borderColor: "#000",
+        });
+
+        var outgoingPicker = new iro.ColorPicker("#outgoingPicker", {
+            color: JSON.parse(localStorage.getItem('style')).outgoing.background,
+            width: 280,
+            borderWidth: 2,
+            borderColor: "#000",
+        });
+
+        ingoingPicker.on(["color:init", "color:change"], function (color) {
+            if ($('#ingoingWhite').is(':checked')) {
+                color = '#fff';
+            } else {
+                color = '#000';
+            }
+
+            localStorage.setItem('style', JSON.stringify({
+                'ingoing': {
+                    'background': color.hexString,
+                    'color': color,
+                },
+                'outgoing': JSON.parse(localStorage.getItem('style')).outgoing,
+            }));
+        });
+
+        outgoingPicker.on(["color:init", "color:change"], function (color) {
+            if ($('#outgoingWhite').is(':checked')) {
+                color = '#fff';
+            } else {
+                color = '#000';
+            }
+
+            localStorage.setItem('style', JSON.stringify({
+                'ingoing': JSON.parse(localStorage.getItem('style')).ingoing,
+                'outgoing': {
+                    'background': color.hexString,
+                    'color': color,
+                },
+            }));
+        });
+    </script>
+</body>
+
+</html>
