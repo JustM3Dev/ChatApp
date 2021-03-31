@@ -1,11 +1,14 @@
 const http = require('http').createServer();
-const db = require('./db.js');
 const io = require('socket.io')(http, {
     cors: { origin: "*" }
 });
+const db = require('./db.js');
 
 io.on('connection', (socket) => {
+    
     /* db.clearDB(); */
+    /* (Made for flushing both of the DB's) */
+
     socket.on('init', (data) => {
         if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': 'The author argument has to be a type of string!' }); console.log('Couldn\'t connect to user.'); return; }
         if (typeof data.uuid != 'string') { io.emit('error', { 'code': 500, 'message': 'The uuid has to be type of number!' }); console.log('Couldn\'t connect to user.'); return; }
@@ -62,11 +65,26 @@ io.on('connection', (socket) => {
         db.newMessage(0, data.message, parseInt(data.uuid));
     });
 
-    socket.on('registerUser', (data) => {
+    /* socket.on('registerUserOld', (data) => {
         db.getUser(data.uuid).then((exists) => {
             if (exists != null) return;
             else {
                 db.createUser(parseInt(data.uuid), data.displayName, 'test@example.com').then(() => {
+                    io.emit('registeredUser', { uuid: data.uuid });
+                    console.log('registered user successfully')
+                }).catch((err) => {
+                    console.log(err.stack);
+                    socket.emit('error', { code: 500, message: 'Internal Server Error' });
+                });
+            }
+        });
+    }); */
+
+    socket.on('registerUser', (data) => {
+        db.getUser(data.uuid).then((exists) => {
+            if (exists != null) return;
+            else {
+                db.createUser(parseInt(data.uuid), data.displayName, data.secret, data.refresh).then(() => {
                     io.emit('registeredUser', { uuid: data.uuid });
                     console.log('registered user successfully')
                 }).catch((err) => {

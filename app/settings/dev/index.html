@@ -52,6 +52,8 @@
         <input type="text" id="pName">
         <button onclick="print()">Print</button>
         <button onclick="printAll()">Print all</button>
+        <button onclick="printAll(null, true)">Prettyrint all</button>
+        <button onclick="printAll(true)">Print all as JSON</button>
         <button onclick="clearConsole()">Clear output</button>
         <input type="checkbox" id="autoScroll" checked>Autoscroll</input>
     <p>
@@ -88,6 +90,11 @@
 
         function remove() {
             var name = $('#rmName').val();
+            var item = localStorage.getItem(name);
+            if (item == null) {
+                termOut(`Cannot delete the non-existent entry ${name}.`);
+                return;
+            }
             localStorage.removeItem(name);
             termOut(`Successfully deleted entry ${name}.`);
         }
@@ -100,8 +107,8 @@
             termOut(out);
         }
 
-        function printAll() {
-            var out = allStorage();
+        function printAll(json, pretty) {
+            var out = allStorage(json, pretty);
             var terminal = $('#console');
             termOut(out);
         }
@@ -132,16 +139,28 @@
         }
 
 
-        function allStorage() {
-            var values = {},
-                keys = Object.keys(localStorage),
-                i = keys.length;
+        function allStorage(json, pretty) {
+            if (json) {
+                var values = {},
+                    keys = Object.keys(localStorage),
+                    i = keys.length;
 
-            while (i--) {
-                values[keys[i]] = localStorage.getItem(keys[i]);
+                while (i--) {
+                    values[keys[i]] = localStorage.getItem(keys[i]);
+                }
+
+                return JSON.stringify(values, null, 4);
             }
 
-            return JSON.stringify(values, null, 4);
+            var values = {},
+                keys = Object.keys(localStorage),
+                i = keys.length,
+                out = "";
+
+            while (i--) {
+                out += `\n${keys[i]}: ${localStorage.getItem(keys[i])}`;
+            }
+            return out;
         }
     </script>
 </body>

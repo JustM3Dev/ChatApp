@@ -1,2 +1,2 @@
-# lan-chat-app
+# ChatApp
 A local network web based chat application.

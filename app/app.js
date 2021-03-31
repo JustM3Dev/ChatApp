@@ -1,20 +1,28 @@
 //const socket = io('ws://localhost:8080', { 'connect timeout': 5000 });
-var socket = io.connect('ws://192.168.4.48:8080', { 'connect timeout': 5000 });
+var socket = io.connect('ws://192.168.4.48:8080', { reconnectionAttempts: 5 });
 var id = getID();
 var name = checkName();
+var auth = checkAuth();
 
 $(document).ready(() => {
-    if (!socket.connected) {
-        console.log('Something went wrong trying to connect to the server. Retrying...');
-        showToast("Couldn't connect to the server.<br>Are you connected to the internet?")
-        setTimeout(() => {
-            if (!socket.connected) {
-                showToast("Our servers seem to be down... Please try again later.");
-            }
+    if (getParameterByName('toast') != null) showToast(getParameterByName('toast'));
 
-        }, 15000)
-        return;
-    }
+    setTimeout(() => {
+        if (!socket.connected) {
+            showToast("Our servers seem to be down... Please try again later.");
+        }
+    }, 1000);
+
+    let disconnect = 0;
+    let discInt = setInterval(() => {
+        if (!socket.connected) {
+            disconnect++;
+            if (disconnect == 5) {
+                $('#reconnectionModal').modal('show');
+                clearInterval(discInt);
+            }
+        } else { disconnect = 0 }
+    }, 6000);
 });
 
 console.log('Connecting...');
@@ -35,9 +43,9 @@ socket.on('disconnect', function () {
     }, 2000)
 });
 
-socket.on('userExistsResult', (data) => {
+socket.on('userExists', (data) => {
     if (data.uuid != id) return;
-    if (!data.result) window.location.href = "/login/";
+    if (!data.result) window.location.href = "/login";
 });
 
 socket.on('sync', (data) => {
@@ -101,7 +109,6 @@ socket.on('message', (data) => {
                 <div class="float-start">
                     You: ${data.message}
                 </div>
-                <input type="image" class="float-end" onclick="messageMenu()" src="/menu.svg"></input>
                 <div class="float-end timestamp">${msg.displayTimestamp}</div>
             </div>
 
@@ -112,20 +119,19 @@ socket.on('message', (data) => {
                 <div class="float-start">
                     ${data.author}: ${data.message}
                 </div>
-                <input type="image" class="float-end" onclick="messageMenu()" src="/menu.svg"></input>
                 <div class="float-end timestamp">${msg.displayTimestamp}</div>
             </div>
             `);
     }
     boxContent.append(content);
-    box.animate({ scrollTop: box.outerHeight(true) }, 1);
+    box.scrollTop(box[0].scrollHeight);
 });
 
 socket.on('error', (data) => {
     window.location.href = `/error/?code=${data.code}&message=${data.message}`;
 });
 
-$(document).on('keypress', function (e) {
+$(document).on('keydown', function (e) {
     if (e.which == 13) {
         if ($('#msgInput').is(':focus')) {
             sendMsg();
@@ -145,12 +151,16 @@ $(document).on('keyup', function (e) {
     }
 });
 
+$(window).resize((e) => { $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight); });
+
 function sendMsg() {
-    const msg = $('#msgInput').val().trim();
+    const msgInput = $('#msgInput');
+    const msg = msgInput.val().trim();
     if (!msg.match(/^[.\n]*$/g)) {
         if (msg.length <= 257) {
             $('#msgInput').val('');
             socket.emit('message', { 'uuid': id, 'author': name, 'message': msg, 'timestamp': new Date() })
+            msgInput.focus();
         } else {
             showToast('This message is too long. Max is 256.')
         }
@@ -180,7 +190,28 @@ function genID() {
     return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())) * 2;
 }
 
+function checkAuth() {
+    localStorage.getItem('name');
+    localStorage.getItem('uuid');
+    localStorage.getItem('name');
+    localStorage.getItem('name');
+}
+
 function showToast(message) {
-    $('.toast-body').html(message);
-    $('.toast').toast('show');
+    let toastID = Math.floor(Math.random() * 1000);
+    let template = `<div id="toast-${toastID}" class="toast text-white bg-primary border-0 mt-2 me-2"><div class="d-flex"><div class="toast-body" id="toast-body-${toastID}">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div></div>`;
+
+    $("#toasts").append(template)
+
+    $(`#toast-body-${toastID}`).html(message);
+    $(`#toast-${toastID}`).toast('show');
+}
+
+function getParameterByName(name, url = window.location.href) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }

@@ -13,36 +13,22 @@
     <button class="btn btn-outline-danger w-100" onclick="modalAction('clearChat')">Clear chat history</button>
     <button class="btn btn-outline-primary w-100 mt-3" id="togglePicker">Customize colors</button>
 
-    <div class="d-flex mt-3 mb-3">
-        <div id="ingoingPicker"></div>
-        <div id="outgoingPicker" class="ms-3"></div>
-    </div>
-
-    <div class="textColor">
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="ingoingText" id="ingoingBlack">
-            <label class="form-check-label" for="ingoingBlack">
-                Black
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="ingoingText" id="ingoingWhite" checked>
-            <label class="form-check-label" for="ingoingWhite">
-                White
-            </label>
-        </div>
-
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="outgoingText" id="outgoingBlack">
-            <label class="form-check-label" for="outgoingBlack">
-                Black
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="outgoingText" id="outgoingWhite" checked>
-            <label class="form-check-label" for="outgoingWhite">
-                White
-            </label>
+    <div class="mt-3 ms-3">
+        <div class="row">
+            <div class="card bg-dark border-secondary col-md-2" style="width:min-content">
+                <div class="card-body">
+                    <h3>In going:</h3>
+                    <div id="ingoingPicker"></div>
+                    <input id="ingoingText" class="form-control mt-3">
+                </div>
+            </div>
+            <div class="card bg-dark border-secondary col-md-2 ms-3" style="width:min-content">
+                <div class="card-body">
+                    <h3>Outgoing:</h3>
+                    <div id="outgoingPicker"></div>
+                    <input id="outgoingText" class="form-control mt-3">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -77,34 +63,44 @@
             borderColor: "#000",
         });
 
-        ingoingPicker.on(["color:init", "color:change"], function (color) {
-            if ($('#ingoingWhite').is(':checked')) {
-                color = '#fff';
-            } else {
-                color = '#000';
-            }
+        $('#outgoingText').val(JSON.parse(localStorage.getItem('style')).outgoing.color);
+        $('#ingoingText').val(JSON.parse(localStorage.getItem('style')).ingoing.color);
 
+        $('#ingoingText').change(() => {
+            localStorage.setItem('style', JSON.stringify({
+                'ingoing': {
+                    'background': JSON.parse(localStorage.getItem('style')).ingoing.background,
+                    'color': $('#outgoingText').val(),
+                },
+                'outgoing': JSON.parse(localStorage.getItem('style')).outgoing,
+            }));
+        })
+
+        $('#outgoingText').change(() => {
+            localStorage.setItem('style', JSON.stringify({
+                'ingoing': JSON.parse(localStorage.getItem('style')).ingoing,
+                'outgoing': {
+                    'background': JSON.parse(localStorage.getItem('style')).outgoing.background,
+                    'color': $('#outgoingText').val(),
+                }
+            }));
+        })
+        ingoingPicker.on(["color:init", "color:change"], function (color) {
             localStorage.setItem('style', JSON.stringify({
                 'ingoing': {
                     'background': color.hexString,
-                    'color': color,
+                    'color': '#fff',
                 },
                 'outgoing': JSON.parse(localStorage.getItem('style')).outgoing,
             }));
         });
 
         outgoingPicker.on(["color:init", "color:change"], function (color) {
-            if ($('#outgoingWhite').is(':checked')) {
-                color = '#fff';
-            } else {
-                color = '#000';
-            }
-
             localStorage.setItem('style', JSON.stringify({
                 'ingoing': JSON.parse(localStorage.getItem('style')).ingoing,
                 'outgoing': {
                     'background': color.hexString,
-                    'color': color,
+                    'color': '#fff',
                 },
             }));
         });

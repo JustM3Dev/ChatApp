@@ -24,27 +24,23 @@ async function newMessage(chatId, message, uuid) {
     });
 }
 
-
-
 class User extends Model { }
 User.init({
     user_id: DataTypes.INTEGER,
     display_name: DataTypes.STRING,
-    email: DataTypes.STRING,
+    client_secret: DataTypes.STRING,
+    client_refresh: DataTypes.STRING,
 }, { sequelize, modelName: 'user', underscore: true, updatedAt: false });
 
-async function createUser(uuid, displayName, email) {
-    if (typeof uuid != 'number') throw new TypeError('UUID must be a type of number!');
-    if (typeof displayName != 'string') throw new TypeError('displayName must be a type of string!');
-    if (typeof email != 'string') throw new TypeError('email must be a type of string!');
-
+async function createUser(uuid, displayName, secret, refresh) {
     sequelize.sync(/* { force: true } */).then(() => {
         User.create({
             user_id: uuid,
             display_name: displayName,
-            email: email,
+            client_secret: secret,
+            client_refresh: refresh,
         }).then((user) => {
-            console.log('Created new user.')
+            console.log('Created new user.', user)
         });
     });
 }
@@ -58,6 +54,7 @@ async function getMessages() {
 
 async function getUsers() {
     return User.findAll().then((res) => {
+        console.log(res)
         return res;
     });
 }

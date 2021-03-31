@@ -15,7 +15,7 @@ body {
   border-radius: 5px;
   border: 20%;
   color: #fff;
-  max-height: calc(100vh - 127px);
+  height: calc(100vh - 127px);
   overflow: auto;
   background-color: #343a40;
 }
@@ -23,6 +23,11 @@ body {
 .outgoing,
 .ingoing {
   width: 80%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -webkit-hyphens: auto;
+      -ms-hyphens: auto;
+          hyphens: auto;
   border-radius: 5px;
   padding-left: 10px;
   padding-right: 10px;
@@ -35,12 +40,12 @@ body {
 
 .outgoing {
   float: left;
-  background: #048f04;
+  /* background: rgb(4, 143, 4); */
 }
 
 .ingoing {
   float: right;
-  background: #0084ff;
+  /* background: rgb(0, 132, 255); */
 }
 
 .footer {
@@ -61,7 +66,7 @@ body {
 .timestamp {
   text-align: right;
   color: #fff;
-  opacity: 0.2;
+  opacity: 0.5;
 }
 
 .blue-text h2 {
