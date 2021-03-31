@@ -57,6 +57,8 @@
                 window.location.href = "/chat";
             }
 
+            socket.emit('registerAuth', null)
+
             socket.on('error', (data) => {
                 window.location.href = `/error/?code=${data.code}&message=${data.message}`;
             });
@@ -102,9 +104,9 @@
             localStorage.setItem("uuid", id);
             localStorage.setItem("clientSecret", secret);
             localStorage.setItem("refreshToken", JSON.stringify({
-                value: refresh,
+                value: refresh.toString(),
                 expiration: Date.now() + (604800 /* seconds */ *
-                    1000 /* Convert to ms*/ ) /* 604800seconds = 7 days */
+                    1000 /* Convert to ms*/ ) /* 60 4800seconds = 7 days */
             }));
 
             socket.emit('registerUser', {

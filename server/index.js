@@ -9,6 +9,7 @@ io.on('connection', (socket) => {
     /* db.clearDB(); */
     /* (Made for flushing both of the DB's) */
 
+    /* Initialize */
     socket.on('init', (data) => {
         if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'author' has to be type of string" }); return; }
         if (typeof data.uuid != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of string" }); return; }
@@ -54,6 +55,7 @@ io.on('connection', (socket) => {
         });
     });
 
+    /* Messaging */
     socket.on('message', (data) => {
         if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'author' has to be type of string" }); return; }
         if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
@@ -64,12 +66,19 @@ io.on('connection', (socket) => {
         db.newMessage(0, data.message, parseInt(data.uuid));
     });
 
+    /* Authentication */
+    socket.on('registerAuth', (data) => {
+        console.log("A unknown user is in the register queue.")
+    });
+
     socket.on('registerUser', (data) => {
         if (typeof data.secret != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'secret' has to be type of string" }); return; }
-        if (typeof data.refresh != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'refresh' has to be type of string" }); return; }
+        if (typeof data.refresh.value != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'refresh.value' has to be type of string" }); return; }
         if (typeof data.displayName != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'displayName' has to be type of string" }); return; }
         if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
-
+        if (data.displayName.length > 9 || data.displayName.length < 3) { io.emit('error', { 'code': 500, 'message': "The argument 'displayName' has to be longer then 3 chars and shorter then 9 chars" }); return; }
+        if (!data.secret.match(/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/g)) { io.emit('error', { 'code': 500, 'message': "The uuid for 'secret' has to be in the uuid4 format." }); return; }
+        
         db.getUser(data.uuid).then((exists) => {
             if (exists != null) return;
             else {
