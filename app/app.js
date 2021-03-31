@@ -191,10 +191,14 @@ function genID() {
 }
 
 function checkAuth() {
-    localStorage.getItem('name');
-    localStorage.getItem('uuid');
-    localStorage.getItem('name');
-    localStorage.getItem('name');
+    var name = localStorage.getItem('displayName'),
+    uuid = localStorage.getItem('uuid'),
+    secret = localStorage.getItem('clientSecret'),
+    refresh = localStorage.getItem('clientRefresh');
+
+    if (name == null || uuid == null || secret == null || refresh == null) { 
+        window.location.href = "/login";
+    }
 }
 
 function showToast(message) {

@@ -48,10 +48,19 @@
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
     <script defer>
         $('document').ready(() => {
-            if (localStorage.getItem('uuid') != null) {
+            var name = localStorage.getItem('displayName'),
+                uuid = localStorage.getItem('uuid'),
+                secret = localStorage.getItem('clientSecret'),
+                refresh = localStorage.getItem('clientRefresh');
+
+            if (!(name == null || uuid == null || secret == null || refresh == null)) {
                 window.location.href = "/chat";
             }
-        })
+
+            socket.on('error', (data) => {
+                window.location.href = `/error/?code=${data.code}&message=${data.message}`;
+            });
+        });
 
         const socket = io.connect('ws://192.168.4.48:8080', {
             'connect timeout': 5000
@@ -71,14 +80,6 @@
         }
 
         function registerUser(name) {
-            /*
-            socket.on('registeredUser', (data) => {
-                if (data.uuid == id) {
-                    localStorage.setItem("displayName", name);
-                    /* window.location.href = "/chat/"; 
-                }
-            });*/
-
             reqUUID().then((res) => {
                 reqUUID().then((data) => {
                     performRegister(res.uuid, data.uuid, name, genID())

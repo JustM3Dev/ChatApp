@@ -5,13 +5,13 @@ const io = require('socket.io')(http, {
 const db = require('./db.js');
 
 io.on('connection', (socket) => {
-    
+
     /* db.clearDB(); */
     /* (Made for flushing both of the DB's) */
 
     socket.on('init', (data) => {
-        if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': 'The author argument has to be a type of string!' }); console.log('Couldn\'t connect to user.'); return; }
-        if (typeof data.uuid != 'string') { io.emit('error', { 'code': 500, 'message': 'The uuid has to be type of number!' }); console.log('Couldn\'t connect to user.'); return; }
+        if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'author' has to be type of string" }); return; }
+        if (typeof data.uuid != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of string" }); return; }
         if (typeof data.amount != 'number') { data.amount = 50 }
 
         console.log(`${data.author} (${data.uuid}) connected. Syncing messages...`);
@@ -55,32 +55,21 @@ io.on('connection', (socket) => {
     });
 
     socket.on('message', (data) => {
-        if (data.author == null) { io.emit('error', { 'code': 500, 'message': 'You didn\'t provide the author argument.' }); return; }
-        if (data.uuid == null) { io.emit('error', { 'code': 500, 'message': 'You didn\'t provide the uuid argument.' }); return; }
-        if (data.message == null || data.message == '') { io.emit('error', { 'code': 500, 'message': 'You didn\'t provide the message argument.' }); return; }
-        if (data.message.length > 256) { io.emit('error', { 'code': 500, 'message': 'Internal Server Error' }); return; }
+        if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'author' has to be type of string" }); return; }
+        if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
+        if (typeof data.message != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'message' has to be type of string" }); return; }
+        if (typeof data.message.length > 256) { io.emit('error', { 'code': 500, 'message': 'Internal Server Error' }); return; }
 
         io.emit('message', { 'uuid': data.uuid, 'author': data.author, 'message': data.message, 'timestamp': data.timestamp });
-
         db.newMessage(0, data.message, parseInt(data.uuid));
     });
 
-    /* socket.on('registerUserOld', (data) => {
-        db.getUser(data.uuid).then((exists) => {
-            if (exists != null) return;
-            else {
-                db.createUser(parseInt(data.uuid), data.displayName, 'test@example.com').then(() => {
-                    io.emit('registeredUser', { uuid: data.uuid });
-                    console.log('registered user successfully')
-                }).catch((err) => {
-                    console.log(err.stack);
-                    socket.emit('error', { code: 500, message: 'Internal Server Error' });
-                });
-            }
-        });
-    }); */
-
     socket.on('registerUser', (data) => {
+        if (typeof data.secret != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'secret' has to be type of string" }); return; }
+        if (typeof data.refresh != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'refresh' has to be type of string" }); return; }
+        if (typeof data.displayName != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'displayName' has to be type of string" }); return; }
+        if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
+
         db.getUser(data.uuid).then((exists) => {
             if (exists != null) return;
             else {
@@ -96,6 +85,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('userExists', (data) => {
+        if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
+
         db.getUser(data.uuid).then((exists) => {
             if (exists == null) io.emit('userExistsResult', { uuid: data.uuid, result: false });
             else io.emit('userExistsResult', { uuid: data.uuid, result: true });
