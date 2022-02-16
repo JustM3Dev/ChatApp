@@ -12,7 +12,7 @@ io.on('connection', (socket) => {
     /* Initialize */
     socket.on('init', (data) => {
         if (typeof data.author != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'author' has to be type of string" }); return; }
-        if (typeof data.uuid != 'string') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of string" }); return; }
+        if (typeof data.uuid != 'number') { io.emit('error', { 'code': 500, 'message': "The argument 'uuid' has to be type of number" }); return; }
         if (typeof data.amount != 'number') { data.amount = 50 }
 
         console.log(`${data.author} (${data.uuid}) connected. Syncing messages...`);
@@ -82,7 +82,7 @@ io.on('connection', (socket) => {
         db.getUser(data.uuid).then((exists) => {
             if (exists != null) return;
             else {
-                db.createUser(parseInt(data.uuid), data.displayName, data.secret, data.refresh).then(() => {
+                db.createUser(parseInt(data.uuid), data.displayName, data.secret, data.refresh.value).then(() => {
                     io.emit('registeredUser', { uuid: data.uuid });
                     console.log('registered user successfully')
                 }).catch((err) => {
@@ -103,4 +103,4 @@ io.on('connection', (socket) => {
     });
 });
 
-http.listen(8080, "192.168.4.48", () => console.log('listening on http://192.168.0.48:8080'));
+http.listen(8088, "0.0.0.0", () => console.log('listening on http://192.168.0.48:8080'));

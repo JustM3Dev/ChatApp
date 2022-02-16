@@ -1,5 +1,5 @@
 //const socket = io('ws://localhost:8080', { 'connect timeout': 5000 });
-var socket = io.connect('ws://192.168.4.48:8080', { reconnectionAttempts: 5 });
+var socket = io.connect('ws://192.168.120.240:8088', { reconnectionAttempts: 5 });
 var id = getID();
 var name = checkName();
 var auth = checkAuth();
@@ -31,6 +31,7 @@ socket.on('connect', function () {
     showToast('Connection successful!')
     console.log('Syncing messages with server...');
 
+    console.log("connect socket id", id);
     socket.emit('init', { 'author': name, 'uuid': id })
     socket.emit('userExists', { uuid: id });
 });
@@ -44,6 +45,7 @@ socket.on('disconnect', function () {
 });
 
 socket.on('userExists', (data) => {
+    console.log("uExists", data);
     if (data.uuid != id) return;
     if (!data.result) window.location.href = "/login";
 });
@@ -180,10 +182,12 @@ function checkName() {
 
 function getID() {
     var uuid = localStorage.getItem('uuid');
+    console.log("uuid getID()", uuid);
     if (uuid == null) {
         window.location.href = '/login/';
     }
-    return uuid;
+
+    return parseInt(uuid, 10);
 }
 
 function genID() {
@@ -194,9 +198,10 @@ function checkAuth() {
     var name = localStorage.getItem('displayName'),
     uuid = localStorage.getItem('uuid'),
     secret = localStorage.getItem('clientSecret'),
-    refresh = localStorage.getItem('clientRefresh');
+    refresh = localStorage.getItem('refreshToken');
 
-    if (name == null || uuid == null || secret == null || refresh == null) { 
+    if (name == null || uuid == null || secret == null || refresh == null) {
+        console.log("checkAuth null", name, uuid, secret, refresh);
         window.location.href = "/login";
     }
 }

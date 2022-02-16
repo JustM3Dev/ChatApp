@@ -48,10 +48,10 @@
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
     <script defer>
         $('document').ready(() => {
-            var name = localStorage.getItem('displayName'),
-                uuid = localStorage.getItem('uuid'),
-                secret = localStorage.getItem('clientSecret'),
-                refresh = localStorage.getItem('clientRefresh');
+            var name = localStorage.getItem('displayName') || null,
+                uuid = localStorage.getItem('uuid') || null,
+                secret = localStorage.getItem('clientSecret') || null,
+                refresh = localStorage.getItem('clientRefresh') || null;
 
             if (!(name == null || uuid == null || secret == null || refresh == null)) {
                 window.location.href = "/chat";
@@ -64,7 +64,7 @@
             });
         });
 
-        const socket = io.connect('ws://192.168.4.48:8080', {
+        const socket = io.connect('ws://192.168.120.240:8088', {
             'connect timeout': 5000
         });
 
@@ -111,7 +111,7 @@
 
             socket.emit('registerUser', {
                 secret: secret,
-                refresh: refresh,
+		refresh: JSON.parse(localStorage.getItem("refreshToken")),
                 displayName: name,
                 uuid: id,
             });
